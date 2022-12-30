@@ -27,8 +27,8 @@ All the infrastracture is managed by docker-compose, that deploy a non productiv
 #### Pre Requisites:
 * Docker: need to be installed and running on the machine: Get docker for mac/unix/windows here: https://docs.docker.com/get-docker/
 * Docker volumes: create this two volumes once docker is installed:
-	 - `docker volume create --name truelayer_postgres-db-volume`
-  - `docker volume create --name truelayer_postgres-db-volume-etl`
+	- `docker volume create --name truelayer_postgres-db-volume`
+  	- `docker volume create --name truelayer_postgres-db-volume-etl`
 * Memory assigned 16 GB of memory and 4 cpu to Docker: From `Docker > Preferences > Resources > Advanced`. More info here: https://docs.docker.com/desktop/settings/windows/
 * Git: need to be installed to clone this project: https://git-scm.com/book/en/v2/Getting-Started-Installing-Git
 
@@ -46,8 +46,9 @@ All the infrastracture is managed by docker-compose, that deploy a non productiv
 * Navigate to Airflow UI at http://localhost:8080 and use the interface to execute the two pipeline:
   -  truefile_pipeline_orchestrator (main pipeline)
   -  truefile_unit_tests (unit testing)
-
 <img width="1765" alt="image" src="https://user-images.githubusercontent.com/28576091/210083584-b9a34711-1957-4d24-a40b-8788366096da.png">
+* Monitor the execution of the pipelines from the UI:
+<img width="1758" alt="image" src="https://user-images.githubusercontent.com/28576091/210085257-adb50b72-956a-44b2-9b9f-95887ca152d7.png">
 
 
 #### Troubleshooting:
@@ -59,7 +60,13 @@ If still not visible, be sure that the project path is inside a parent folder th
 
 
 ### **4. Explainations**
+#### Tools
+* **Python**: python is a powerful language for data analysis tasks that leverage a great libraries like pandas & numpy. It was used for his simplicity, the compatibility with Airflow dags, and for the presence of Spark APIs.
+* **Spark**: Spark is one of the main data processing framewok for distributing computation. The reason to choose Spark with pySpark to perform the main data preprocessing part, is to design an develop system natively ready to scale over more data and machines to provide better performance. It's important to note that in this specific use case and with this amount of data, the difference to use spark vs pure python is it's pretty irrelevant, but in enterprise scenarios with much more data, it is definitely to be preferred.
+* **Airflow**: Airflow is a simple and powerfull orchestrator written in python. It's was used to orchestrate the various pipeline, monitor the workflow execution and provide to the end user and nice UI.
+* **Docker**: Tool used by developers to create, deploy and manged container application. It's was a great choise in order to provide a reproducible, isolated and light enviroment that can be executed on multiple OS.
 
+#### Design/Algorithmic Decisions
 
 
 ### **5. Unit Test**
