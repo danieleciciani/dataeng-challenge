@@ -33,17 +33,18 @@ All the infrastracture is managed by docker-compose, that deploy a non productiv
 * Git: need to be installed to clone this project: https://git-scm.com/book/en/v2/Getting-Started-Installing-Git
 
 #### Steps:
-* git clone https://github.com/danieleciciani/dataeng-challenge.git
+* Clone the repo: `git clone https://github.com/danieleciciani/dataeng-challenge.git`
 * cd into dataeng-challenge/
 * create the following folders with: `mkdir -p ./logs ./plugins ./output ./data`
 * Upload the `movies_metadata.csv` into the ./data folder
 * Execute this command to your host user id used to mount the local folder data, dags, output, logs: `echo -e "AIRFLOW_UID=$(id -u)" > .env`
 * Execute the build of the customized airflow image with Spark: `docker build . -f Dockerfile --pull --tag airflow-spark-image:0.0.1`
-* Once the build is complete, execute the airflow init `docker compose up airflow-init` and then, spin up all the containers `docker compose up -d`
+* Once the build is complete, execute the airflow init `docker compose up airflow-init`
+* Then, spin up all the containers `docker compose up -d`
 * Create the local spark and postgress connection in airflow. Executing
-  - `docker exec truelayer-airflow-webserver-1 airflow connections add --conn-type 'postgres' --conn-host 'postgres_etl' --conn-schema 'truefilm_db' --conn-login 'truefilm' --conn-password "truefilm" --conn-port "5432" 'conn_postgres'`
-  - `docker exec truelayer-airflow-webserver-1 airflow connections add --conn-type 'Spark' --conn-host 'local[*]' 'spark_local'`
-* Navigate to Airflow UI at http://localhost:8080, login with `airflow/airflow` and use the interface to execute the two pipeline:
+  - `docker exec dataeng-challenge-airflow-webserver-1 airflow connections add --conn-type 'postgres' --conn-host 'postgres_etl' --conn-schema 'truefilm_db' --conn-login 'truefilm' --conn-password "truefilm" --conn-port "5432" 'conn_postgres'`
+  - `docker exec dataeng-challenge-airflow-webserver-1 airflow connections add --conn-type 'Spark' --conn-host 'local[*]' 'spark_local'`
+* Navigate to Airflow UI at http://localhost:8080, login with `airflow/airflow` and use the interface to execute the two pipeline, clicking in the red section highlited on the screenshot:
   -  truefile_pipeline_orchestrator (main pipeline)
   -  truefile_unit_tests (unit testing)
 <img width="1765" alt="image" src="https://user-images.githubusercontent.com/28576091/210083584-b9a34711-1957-4d24-a40b-8788366096da.png">
@@ -53,7 +54,7 @@ All the infrastracture is managed by docker-compose, that deploy a non productiv
 
 #### Troubleshooting:
 If for some reason at the airflow start up the two dags are not visible in the UI, execute the following command in one shell:
-* `docker exec truelayer-airflow-scheduler-1 airflow dags reserialize`
+* `docker exec dataeng-challenge-airflow-scheduler-1 airflow dags reserialize`
 
 If still not visible, be sure that the project path is inside a parent folder that Docker trust to allow the volume mount. Verify it from `Docker > Preferences > Resources > File sharing`. If not, add it and restart Docker.
 
@@ -67,6 +68,7 @@ If still not visible, be sure that the project path is inside a parent folder th
 * **Docker**: Tool used by developers to create, deploy and manged container application. It's was a great choise in order to provide a reproducible, isolated and light enviroment that can be executed on multiple OS.
 
 #### Design/Algorithmic Decisions
+- Since the complexty due to Kaggle credentials/login to download the imbd data, the pipeline expect 'movies_metadata.csv' to be already present in the data folder, while the wiki data is download by the pipeline.
 - To Execute Spark from Airflow, it's has been decide to choose the SparkSubmitOperator. The reason to use it, was to provide to the user a better management of Spark job in Airflow especially for the deployment. Infact, with SparkSubmitOperator it's possible to easy leverage the classic spark-submit options and easly managed the required resources in term of cpu & memory for the job. A drowback of use this spark operator istead of execute spark from classic functions with the PythonOperator, it's due to not being able to take advantage of Airflow's xcom.
 - The parsing of XML files has been performed with a databricks connector present here https://github.com/databricks/spark-xml that which simplified  tremendously the parsing of the xml wiki dataset.
 - After the calculating of the ratio between budget and revenue columns, since we require only top 1000 rows, its ideal to join only those 1000 rows from IMDB dataset with the wiki info.
