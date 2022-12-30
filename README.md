@@ -35,7 +35,8 @@ All the infrastracture is managed by docker-compose, that deploy a non productiv
 #### Steps:
 * git clone https://github.com/danieleciciani/dataeng-challenge.git
 * cd into dataeng-challenge/
-* create the following folder: `mkdir -p ./logs ./plugins ./output`
+* create the following folders with: `mkdir -p ./logs ./plugins ./output ./data`
+* Upload the `movies_metadata.csv` into the ./data folder
 * Execute this command to your host user id used to mount the local folder data, dags, output, logs: `echo -e "AIRFLOW_UID=$(id -u)" > .env`
 * Execute the build of the customized airflow image with Spark: `docker build . -f Dockerfile --pull --tag airflow-spark-image:0.0.1`
 * Once the build is complete, execute the airflow init `docker compose up airflow-init` and then, spin up all the containers `docker compose up -d`
@@ -53,7 +54,7 @@ All the infrastracture is managed by docker-compose, that deploy a non productiv
 If for some reason at the airflow start up, the two dags are not visible in the UI, execute the following command in one shell:
 * `docker exec truelayer-airflow-scheduler-1 airflow dags reserialize`
 
-If still not visible, be sure that the project path is inside a parent folder that Docker trust to allow the volume mount.
+If still not visible, be sure that the project path is inside a parent folder that Docker trust to allow the volume mount. Verify it from `Docker > Preferences > Resources > File sharing`. If not, add it and restart Docker.
 
 
 
