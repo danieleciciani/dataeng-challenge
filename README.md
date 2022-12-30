@@ -29,7 +29,7 @@ All the infrastracture is managed by docker-compose, that deploy a non productiv
 * Docker volumes: create this two volumes once docker is installed:
 	- `docker volume create --name truelayer_postgres-db-volume`
   	- `docker volume create --name truelayer_postgres-db-volume-etl`
-* Memory assigned 16 GB of memory and 4 cpu to Docker: From `Docker > Preferences > Resources > Advanced`. More info here: https://docs.docker.com/desktop/settings/windows/
+* Assigned 16 GB of memory and 4 cpu to Docker: From `Docker > Preferences > Resources > Advanced`. More info here: https://docs.docker.com/desktop/settings/windows/
 * Git: need to be installed to clone this project: https://git-scm.com/book/en/v2/Getting-Started-Installing-Git
 
 #### Steps:
@@ -62,15 +62,21 @@ If still not visible, be sure that the project path is inside a parent folder th
 ### **4. Explainations**
 #### Tools
 * **Python**: python is a powerful language for data analysis tasks that leverage a great libraries like pandas & numpy. It was used for his simplicity, the compatibility with Airflow dags, and for the presence of Spark APIs.
-* **Spark**: Spark is one of the main data processing framewok for distributing computation. The reason to choose Spark with pySpark to perform the main data preprocessing part, is to design an develop system natively ready to scale over more data and machines to provide better performance. It's important to note that in this specific use case and with this amount of data, the difference to use spark vs pure python is it's pretty irrelevant, but in enterprise scenarios with much more data, it is definitely to be preferred.
-* **Airflow**: Airflow is a simple and powerfull orchestrator written in python. It's was used to orchestrate the various pipeline, monitor the workflow execution and provide to the end user and nice UI.
+* **Spark**: Spark is one of the main data processing framewok for distributing computation. The reason to choose Spark with pySpark to perform the main data preprocessing part, is to design an develop system natively ready to scale over more data and machines to provide better performance. It's important to note that in this specific deployment (local), the difference to use spark vs pure python is it's pretty irrelevant, but in enterprise scenarios with much more data, it is definitely to be preferred. If Scala was used instead of python to leverage Spark, could have been considered to deploy a spark cluster and distributed the application on it istead of make it run locally https://www.agilelab.it/blog/apache-spark-3-0-development-cluster-single-machine-using-docker
+* **Airflow**: Airflow is a simple and powerfull orchestrator written in python. It's was used to orchestrate the various pipeline, monitor the workflow execution and provide to the end user a nice UI to view logs, execution status and trigger new run.
 * **Docker**: Tool used by developers to create, deploy and manged container application. It's was a great choise in order to provide a reproducible, isolated and light enviroment that can be executed on multiple OS.
 
 #### Design/Algorithmic Decisions
+- To Execute Spark from Airflow, it's has been decide to choose the SparkSubmitOperator. The reason to use it, was to provide to the user a better management of Spark job in Airflow especially for the deployment. Infact, with SparkSubmitOperator it's possible to easy leverage the classic spark-submit options and easly managed the required resources in term of cpu & memory for the job. A drowback of use this spark operator istead of execute spark from classic functions with the PythonOperator, it's due to not being able to take advantage of Airflow's xcom.
+- The parsing of XML files has been performed with a databricks connector present here https://github.com/databricks/spark-xml that which simplified  tremendously the parsing of the xml wiki dataset.
+- After the calculating of the ratio between budget and revenue columns, since we require only top 1000 rows, its ideal to join only those 1000 rows from IMDB dataset with the wiki info.
+- 
 
 
 ### **5. Unit Test**
-
+* pytest python package has been used for unit testing
+* Check on columns and data have been performed to verify if any inconsistent or wrong data have been processed.
+* Perfemed test to verify the presence in the final output, of some of the most high profit movies as reported online on https://www.imdb.com
 
 
 
