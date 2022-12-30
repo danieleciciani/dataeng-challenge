@@ -1,0 +1,8 @@
+SQLAlchemy
+psycopg2
+pytest
+pyspark
+pandas
+apache-airflow-providers-apache-spark
+requests
+pytest
