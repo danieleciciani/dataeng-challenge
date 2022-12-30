@@ -46,7 +46,7 @@ high_profit_movies = SparkSubmitOperator(
     application='/opt/airflow/dags/high_profit_movies_spark.py',
     conn_id='spark_local', 
     packages='com.databricks:spark-xml_2.12:0.15.0',
-    driver_memory='16G',
+    driver_memory='12G',
     application_args=["{{ti.xcom_pull(key='imdb_info')}}",\
                      "{{ti.xcom_pull(key='wiki_info')}}",\
                       OUTPUT_FULL_NAME]
